@@ -1,40 +1,24 @@
 package com.amsen.par.placessearch.view.activity;
 
-import android.app.Activity;
-import android.app.SearchManager;
-import android.content.Context;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.view.ViewGroupCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DecorToolbar;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.PopupWindow;
+import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.amsen.par.placessearch.R;
+import com.amsen.par.placessearch.model.Prediction;
+import com.amsen.par.placessearch.view.view.PlacesAutoCompleteSearchView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-import static rx.schedulers.Schedulers.test;
 
 /**
  * @author Pär Amsen 2016
  */
 public class MainActivity extends AppCompatActivity {
-    @BindView(R.id.hello)
-    View v;
+    @BindView(R.id.selectedPrediction)
+    TextView view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +31,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
+
+        MenuItem searchViewItem = menu.findItem(R.id.action_search);
+        PlacesAutoCompleteSearchView searchView = (PlacesAutoCompleteSearchView) searchViewItem.getActionView();
+
+        searchView.setOnPredictionClickListener((position, autoCompletePrediction) -> {
+            Prediction prediction = (Prediction) autoCompletePrediction.value;
+            view.setText(String.format("{place.description: \"%s\", place.placeId: \"%s\"}", prediction.description, prediction.placeId));
+            searchViewItem.collapseActionView();
+        });
 
         return true;
     }

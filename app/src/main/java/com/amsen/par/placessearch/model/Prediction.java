@@ -1,5 +1,7 @@
 package com.amsen.par.placessearch.model;
 
+import com.squareup.moshi.Json;
+
 import java.util.List;
 
 /**
@@ -7,6 +9,7 @@ import java.util.List;
  */
 public class Prediction {
     public final String id;
+    @Json(name = "place_id")
     public final String placeId;
     public final String description;
     public final List<Terms> terms;
