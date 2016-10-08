@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.amsen.par.placessearch.R;
@@ -17,8 +18,12 @@ import butterknife.ButterKnife;
  * @author Pär Amsen 2016
  */
 public class MainActivity extends AppCompatActivity {
+    @BindView(R.id.clickSearch)
+    View clickSearch;
+    @BindView(R.id.title)
+    TextView title;
     @BindView(R.id.selectedPrediction)
-    TextView view;
+    TextView selectedPrediction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +41,12 @@ public class MainActivity extends AppCompatActivity {
         PlacesAutoCompleteSearchView searchView = (PlacesAutoCompleteSearchView) searchViewItem.getActionView();
 
         searchView.setOnPredictionClickListener((position, autoCompletePrediction) -> {
+            clickSearch.setVisibility(View.GONE);
+            title.setVisibility(View.VISIBLE);
+            selectedPrediction.setVisibility(View.VISIBLE);
+
             Prediction prediction = (Prediction) autoCompletePrediction.value;
-            view.setText(String.format("{place.description: \"%s\", place.placeId: \"%s\"}", prediction.description, prediction.placeId));
+            selectedPrediction.setText(String.format("Place.description: \"%s\"\nPlace.placeId: \"%s\"", prediction.description, prediction.placeId));
             searchViewItem.collapseActionView();
         });
 

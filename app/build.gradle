@@ -16,6 +16,14 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    signingConfigs {
+        debug {
+            keyAlias 'qqqqqq'
+            keyPassword 'qqqqqq'
+            storeFile file('dev.jks')
+            storePassword 'qqqqqq'
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -42,5 +50,5 @@ dependencies {
 
     compile 'com.squareup.moshi:moshi:1.2.0'
 
-    compile 'com.amsen.par:searchview:0.7.3'
+    compile 'com.amsen.par:searchview:0.7.4'
 }
