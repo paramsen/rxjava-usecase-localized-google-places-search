@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -24,30 +25,41 @@ public class PlacesAutoCompleteSearchView extends AutoCompleteSearchView {
 
     public PlacesAutoCompleteSearchView(Context context) {
         super(context);
+        init();
     }
 
     public PlacesAutoCompleteSearchView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
 
     public PlacesAutoCompleteSearchView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init() {
+        api = new PlacesApi();
     }
 
     public void initBehavior() {
-        api = new PlacesApi();
-
         publishRawQueries();
         subscribeRawQueries();
     }
 
     private void subscribeRawQueries() {
-        queryStream.asObservable().throttleWithTimeout(200, TimeUnit.MILLISECONDS, Schedulers.computation())
+        Observable<String> filtered = queryStream.asObservable()
+                .filter(query -> query.length() > 0)
+                .doOnNext(e -> showLoader())
+                .share();
+
+        filtered.throttleWithTimeout(200, TimeUnit.MILLISECONDS, Schedulers.computation())
                 .take(1)
-                .concatWith(queryStream.asObservable().throttleWithTimeout(600, TimeUnit.MILLISECONDS, Schedulers.computation()))
+                .concatWith(filtered.throttleWithTimeout(600, TimeUnit.MILLISECONDS, Schedulers.computation()))
                 .flatMap(api::getPredictions)
                 .map(this::toAutoCompletePredictions)
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(e -> hideLoader())
                 .subscribe(this::applyPredictions, Throwable::printStackTrace);
     }
 
@@ -89,13 +101,5 @@ public class PlacesAutoCompleteSearchView extends AutoCompleteSearchView {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         queryStream.onCompleted();
-    }
-
-    public class OnClickPredictionEvent {
-        public final Prediction prediction;
-
-        public OnClickPredictionEvent(Prediction prediction) {
-            this.prediction = prediction;
-        }
     }
 }

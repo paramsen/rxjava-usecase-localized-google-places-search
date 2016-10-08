@@ -42,5 +42,5 @@ dependencies {
 
     compile 'com.squareup.moshi:moshi:1.2.0'
 
-    compile 'com.amsen.par:searchview:0.6.7'
+    compile 'com.amsen.par:searchview:0.7.3'
 }
